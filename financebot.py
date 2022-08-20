@@ -11,7 +11,7 @@ bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start']) 
 def send_welcome(message):
-	bot.reply_to(message, "Здравствуйте <b>{0} {1}</b>, Вас приветсвует финансовый бот. Данный бот предназначен для записи <b>доходов</b> и <b>расходов</b> ваших финансов.\n<b>На данный момент бот содержит следующие команды:</b>\n1) /stats - показать основную статистику.\n2) /fullstats - показать полную статистику.\n3) /earnings - записать свои доходы.\n4) /spending - записать свои расходы.\n5) /delete - удалить всю свою информацию.".format(message.from_user.first_name, message.from_user.last_name), parse_mode = 'html')
+	bot.reply_to(message, "Здравствуйте <b>{0} {1}</b>, Вас приветсвует финансовый бот Себастьян. Данный бот предназначен для записи <b>доходов</b> и <b>расходов</b> ваших финансов.\n<b>На данный момент бот содержит следующие команды:</b>\n1) /stats - показать основную статистику.\n2) /fullstats - показать полную статистику.\n3) /earnings - записать свои доходы.\n4) /spending - записать свои расходы.\n5) /delete - удалить всю свою информацию.".format(message.from_user.first_name, message.from_user.last_name), parse_mode = 'html')
 
 @bot.message_handler(commands=['earnings']) 
 def send_earnings(message):
