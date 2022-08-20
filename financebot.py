@@ -11,10 +11,12 @@ bot = telebot.TeleBot(token)
 
 @bot.message_handler(commands=['start']) 
 def send_welcome(message):
+	''' Выводит приветственное сообщение и небольшую инструкцию '''
 	bot.reply_to(message, "Здравствуйте <b>{0} {1}</b>, Вас приветсвует финансовый бот Себастьян. Данный бот предназначен для записи <b>доходов</b> и <b>расходов</b> ваших финансов.\n<b>На данный момент бот содержит следующие команды:</b>\n1) /stats - показать основную статистику.\n2) /fullstats - показать полную статистику.\n3) /earnings - записать свои доходы.\n4) /spending - записать свои расходы.\n5) /delete - удалить всю свою информацию.".format(message.from_user.first_name, message.from_user.last_name), parse_mode = 'html')
 
 @bot.message_handler(commands=['earnings']) 
 def send_earnings(message):
+	''' Выводит кнопки для выбора вида дохода '''
 	keyboard = types.ReplyKeyboardMarkup() 
 	work = types.KeyboardButton(text='👨‍💼 Основная работа')
 	under_work = types.KeyboardButton(text='👨‍💻 Дополнительный заработок')
@@ -24,6 +26,7 @@ def send_earnings(message):
 
 @bot.message_handler(commands=['spending']) 
 def send_spendings(message):
+	''' Выводит кнопки для выбора вида расхода '''
 	keyboard = types.ReplyKeyboardMarkup() 
 	House = types.KeyboardButton(text='🏠 Дом')
 	Food_products = types.KeyboardButton(text='🍞 Продукты питания')
@@ -41,6 +44,7 @@ def send_spendings(message):
 
 @bot.message_handler(commands=['stats']) 
 def show_statistic(message):
+	''' Выводит основную информацию об доходах и расходах '''
 	with sqlite3.connect('Finance.db') as connect: # подключение к базе данных
 		cur =  connect.cursor()
 		cur.execute(''' SELECT SUM(income) FROM earnings;''')
@@ -58,6 +62,7 @@ def show_statistic(message):
 
 @bot.message_handler(commands=['fullstats']) 
 def show_fullstatistic(message):
+	''' Выводит полную статистику пользователя '''
 	with sqlite3.connect('Finance.db') as connect:
 		cur =  connect.cursor()
 		cur.execute(''' SELECT category,income FROM earnings ORDER BY income DESC;''')
@@ -69,6 +74,7 @@ def show_fullstatistic(message):
 
 @bot.message_handler(commands=['delete'])
 def delete_statistic(message):
+	''' Удаляет данные пользователя ''' 
 	with sqlite3.connect('Finance.db') as connect:
 		cur =  connect.cursor()
 		cur.execute(''' UPDATE earnings SET income = 0 WHERE income > 0 ''')
@@ -76,7 +82,8 @@ def delete_statistic(message):
 	bot.send_message(message.from_user.id, 'Информация успешно очищена')
 
 @bot.message_handler(func=lambda m: True)
-def echo_all(message):
+def receiving_messages(message):
+	''' Обрабатывает ответы пользователя и вызывает необходимые функции '''
 	if message.text == '👨‍💼 Основная работа':
 		bot.send_message(message.from_user.id, 'Введите цифрами, какую сумму вы хотите внести',reply_markup = types.ReplyKeyboardRemove())
 		bot.register_next_step_handler(message, send_earning,'Основная работа')
@@ -113,7 +120,7 @@ def echo_all(message):
 
 
 def decorator(func):
-	''' Декоратор  '''
+	''' Декоратор, который отвечает за правильное заполнение формы запроса  '''
 	def inner(message,category):
 		sum_ = 0
 		while sum_ == 0:
@@ -131,6 +138,7 @@ def decorator(func):
 
 @decorator
 def send_earning(message,category):
+	''' Делает запрос на пополнение доходов '''
 	sum_ = int(message.text)
 	with sqlite3.connect('Finance.db') as connect: 
 		cur =  connect.cursor()
@@ -140,6 +148,7 @@ def send_earning(message,category):
 
 @decorator
 def send_spending(message,category):
+	''' Делает запрос на пополнение расходов '''
 	sum_ = int(message.text)
 	with sqlite3.connect('Finance.db') as connect: 
 		cur =  connect.cursor()
